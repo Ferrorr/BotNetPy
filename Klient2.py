@@ -41,29 +41,31 @@ if __name__ == '__main__':
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         flag = 0
-        while flag != 1:
-            time.sleep(0.5)
-            try:
-                s.connect((HOST, PORT))
-                flag = 1
-            except:
-                flag = 0
-                continue
+        while True:
 
-        checkForOtherDevices(HOST)
-        #while True: czekaj na dane
-        #s.sendall(b'Beginn attack')
-        # data = s.recv(1024)
-        # if data==1:
-        #     
-        # if data==2:
+            while flag != 1:
+                time.sleep(0.5)
+                try:
+                    s.connect((HOST, PORT))
+                    flag = 1
+                except:
+                    flag = 0
+                    continue
 
-        # wyślij swój adres ip przy:
-        # - każdym połączeniu
-        # - po każdym ataku
+            checkForOtherDevices(HOST)
+            #while True: czekaj na dane
+            #s.sendall(b'Beginn attack')
+            data = s.recv(1024)
+            # if data==1:
+            #
+            # if data==2:
 
-        # ip = get('https://api.ipify.org').text
-        # print('public IP address: {}'.format(ip))
-        # print('operating port: {}'.format(PORT))
+            # wyślij swój adres ip przy:
+            # - każdym połączeniu
+            # - po każdym ataku
 
-    print('Received', repr(data))
+            # ip = get('https://api.ipify.org').text
+            # print('public IP address: {}'.format(ip))
+            # print('operating port: {}'.format(PORT))
+
+            print('Received', repr(data))

@@ -2,6 +2,8 @@
 import socket
 
 from threading import Thread
+
+
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
@@ -9,10 +11,11 @@ from threading import Thread
 # do każdego połączenia inne ip
 # wysłać komunikat o rozpoczęciu ataku
 
-def new_client(s,addr):
+
+def new_client(s, addr):
     while True:
         msg = s.recv(1024)
-        msg=raw_input('Server>> ')
+        msg = input('Server>> ')
         s.send(msg)
     s.close()
 
@@ -80,6 +83,5 @@ if __name__ == '__main__':
         print('Connected to :', addr[0], ':', addr[1])
 
         # Start a new thread and return its identifier
-        start_new_thread(threaded, (c,addr))
+        start_new_thread(threaded, (c, addr))
     s.close()
-
