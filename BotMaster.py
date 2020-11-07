@@ -6,7 +6,7 @@ def show_menu():
     print('|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|')
     print('|    Do you want to start the attack?   |')
     print('|---------------------------------------|')
-    print('|Press "1" to run a Ping of Death attack|')
+    print('|Press "1" to run a ICMP Flood attack   |')
     print('|---------------------------------------|')
     print('|Press "2" to run a TCP SYN Flood attack|')
     print('|_______________________________________|')
