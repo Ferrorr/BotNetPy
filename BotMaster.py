@@ -10,6 +10,13 @@ def show_menu():
     print('|---------------------------------------|')
     print('|Press "2" to run a TCP SYN Flood attack|')
     print('|_______________________________________|')
+    #syn flood nie zaimplementowany jeszcze
+    #można dodać :
+    # Ping of Death
+    # UDP Flood
+    # HTTP Flood
+    # Slowloris
+
 
 
 def est_connection(s):
