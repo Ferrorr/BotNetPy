@@ -2,11 +2,6 @@ import socket
 import time
 import telnetlib
 
-
-#       ^
-#       |
-# nie jest defaultowo zainstalowane -> można uruchomić proces na zainfekowanym hoście tj. run(pip3 install xtelnet)
-
 # from requests import get       ->       można publiczny ip używać    w sumie nie wiem po co xD
 from _thread import start_new_thread
 
