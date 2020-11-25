@@ -10,13 +10,12 @@ def show_menu():
     print('|---------------------------------------|')
     print('|Press "2" to run a TCP SYN Flood attack|')
     print('|_______________________________________|')
-    #syn flood nie zaimplementowany jeszcze
-    #można dodać :
+    # syn flood nie zaimplementowany jeszcze
+    # można dodać :
     # Ping of Death
     # UDP Flood
     # HTTP Flood
     # Slowloris
-
 
 
 def est_connection(s):
@@ -39,25 +38,32 @@ def est_connection(s):
 if __name__ == '__main__':
 
     HOST = '127.0.0.1'  # The server's hostname or IP address
-    # HOST = '192.168.100.7'
-    PORT = 65432        # The port used by the server
-
+    # HOST = '192.168.100.6'
+    PORT = 65432  # The port used by the server
+    show_menu()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
         while True:
-            show_menu()
 
             attack = str(input(':'))
             if attack == '1':
                 print('Enter the target IP adddress XXX.XXX.XXX.XXX')
                 victimIP = str(input(':'))  # Walidować?
                 est_connection(s)
-
                 s.send(str(victimIP).encode())
+                print("attack is in motion")
+                print("press 'x' to stop the attack")
+                stopattack = str(input(':'))
+                if stopattack == 'x':
+                    print("stopping the attack")
+                    s.send('x'.encode())
+
+
             elif attack == '2':
                 est_connection(s)
                 # send 2 -> run tcp flood
             else:
                 continue
+            time.sleep(20)
             # s.send('2'.encode())
             # data = s.recv(1024)
