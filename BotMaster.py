@@ -38,6 +38,7 @@ def est_connection(s):
 if __name__ == '__main__':
 
     HOST = '127.0.0.1'  # The server's hostname or IP address
+    HOST = '192.168.100.11'
     # HOST = '192.168.100.6'
     PORT = 65432  # The port used by the server
     show_menu()

@@ -62,6 +62,7 @@ def thread_for_zombieBot(c, addr):
 
 if __name__ == '__main__':
     host = '127.0.0.1'
+    host = '192.168.100.11'
     port = 65432
     max_connections = 5
     pom = 0
