@@ -149,7 +149,6 @@ if __name__ == '__main__':
 
                     socket.detach()
                     socket.close()
-                    client_socket.sendall("XkurwaD".encode())
 
                     sys.exit(0)
                     print("Wtf")
