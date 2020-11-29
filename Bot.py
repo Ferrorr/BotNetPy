@@ -81,7 +81,7 @@ def telnetConnect(ip_address, victimIP, attackType: int):
 
                     # tn.write(b"exit\n")
             tn.close()
-
+    print("telnet is done")
     # t.close()
 
 
@@ -144,7 +144,6 @@ if __name__ == '__main__':
                     attack = True
                 else:
                     print('something went wrong')
-
                 # todo:zrobić try zeby sie nie wywalilo
                 stop = str(s.recv(1).decode())
                 if stop == '0':
