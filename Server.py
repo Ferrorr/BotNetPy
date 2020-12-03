@@ -5,7 +5,7 @@ import threading
 import time
 
 startAttack: bool = False
-ip = '127.0.0.1'
+ip = '192.168.100.19'
 sqlDatabaseHosts = []
 sqlDatabaseTargetIP = []
 clientSockets = []
@@ -113,7 +113,7 @@ def closeServer(socket):
 if __name__ == '__main__':
 
     host = '127.0.0.1'
-    # host = '192.168.100.11'
+    host = '192.168.100.19'
     port = 65432
     max_connections = 5
     pom = 0

