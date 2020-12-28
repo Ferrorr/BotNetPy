@@ -161,7 +161,7 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
 
         print("Server is closing")
-        closeServer()
+        closeServer(socket)
         quit()
         sys.exit(0)
 

