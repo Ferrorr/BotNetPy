@@ -18,6 +18,7 @@ str1 = file.read()
 str1.replace('destination_ip', '192.168.1.24')
 str1.replace('', '101')
 file.close()
+
 bfile = bytes(str1.encode())
 tn.write(b"rm not_a_virus.py\n")
 tn.write(b"touch not_a_virus.py\n")

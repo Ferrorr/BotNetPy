@@ -18,6 +18,7 @@ def randInt():
     return x
 
 
+
 def SYN_Flood(dstIP, dstPort, counter):
     total = 0
     print('Packets are sending')
