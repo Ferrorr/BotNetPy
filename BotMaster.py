@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     HOST = '127.0.0.1'  # The server's hostname or IP address
     # HOST = '192.168.100.11'
-    HOST = '192.168.100.19'
+    #HOST = '192.168.100.19'
     PORT = 65432  # The port used by the server
     show_menu()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -57,18 +57,17 @@ if __name__ == '__main__':
             if attack != '1' and attack != '2':
                 print("Wrong number\nplease try again")
                 continue
-
+            est_connection(s)
             s.send(attack.encode())
 
             print('Enter the target IPv4 adddress XXX.XXX.XXX.XXX')
             victimIP = str(input(':'))  # Walidować?
             if attack == '2':
                 victimPort = str(input('Port\n:'))
-            est_connection(s)
 
             s.send(str(victimIP).encode())
-            if attack == '2':
-                s.send(victimPort.encode())
+            # if attack == '2':
+            #     s.send(victimPort.encode())
 
             print("attack is in motion")
 

