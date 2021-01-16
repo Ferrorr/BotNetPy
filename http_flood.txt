@@ -1,12 +1,12 @@
 
 import random,socket,string,sys,threading,time
 host = 'destination_host'
-ip = ''
+ip = 'destination_ip'
 port = 666
 num_requests = 1
 try:
     host = str(host.replace('https://', '').replace('http://', '').replace('www.', ''))
-    ip = socket.gethostbyname(host)
+    #ip = socket.gethostbyname(host)
 except socket.gaierror:
     print (' ERROR\n Make sure you entered a correct website')
     quit()

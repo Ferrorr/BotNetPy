@@ -54,7 +54,7 @@ if __name__ == '__main__':
         while True:
 
             attack = str(input(':'))
-            if attack != '1' and attack != '2':
+            if attack != '1' and attack != '2' and attack !='3':
                 print("Wrong number\nplease try again")
                 continue
             est_connection(s)
