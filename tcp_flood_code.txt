@@ -10,7 +10,7 @@ from scapy.all import *
 
 def randomIP():
     ip = '.'.join(map(str, (random.randint(0, 255) for _ in range(4))))
-    return '192.168.100.90'
+    return ip
 
 
 def randInt():
