@@ -114,7 +114,7 @@ def closeServer(s):
 if __name__ == '__main__':
 
     host = '127.0.0.1'
-    #host = '192.168.100.19'
+    #host = '192.168.100.6'
     port = 65432
     max_connections = 5
     pom = 0
