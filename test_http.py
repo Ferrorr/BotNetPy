@@ -17,7 +17,7 @@ file = open('http_flood.txt', 'r')
 strr = file.read()
 #newstr = strr.replace("destination_host", 'imap.poczta.onet.pl')
 newstr = strr.replace("destination_ip", '213.180.147.154')
-str1 = newstr.replace('666', '143')
+str1 = newstr.replace('666', '443')
 
 #print(str1)
 # str1.replace('', '101')

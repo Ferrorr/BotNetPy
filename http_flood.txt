@@ -3,7 +3,7 @@ import random,socket,string,sys,threading,time
 host = 'destination_host'
 ip = 'destination_ip'
 port = 666
-num_requests = 1
+num_requests = 50000
 try:
     host = str(host.replace('https://', '').replace('http://', '').replace('www.', ''))
     #ip = socket.gethostbyname(host)

