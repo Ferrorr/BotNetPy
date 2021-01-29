@@ -8,9 +8,9 @@ from PyQt5.QtGui import *
 
 ip = ["", "", "", ""]
 attack = 0
-HOST = '127.0.0.1'  # The server's hostname or IP address
+#HOST = '127.0.0.1'  # The server's hostname or IP address
 # HOST = '192.168.100.11'
-# HOST = '192.168.100.19'
+HOST = '192.168.100.7'
 PORT = 65432  # The port used by the server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -106,7 +106,7 @@ class Example(QWidget):
         grid.addWidget(self.attackButton_2, 2, 1, 1, 1)
 
         # Typ Ataku3
-        self.attackButton_3 = QPushButton("Atak 3")
+        self.attackButton_3 = QPushButton("HTTP GET Flood")
         self.attackButton_3.setCheckable(True)
         self.attackButton_3.clicked.connect(self.buttonAttackState)
         grid.addWidget(self.attackButton_3, 2, 2, 1, 1)

